@@ -11,10 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- MOTOR DE MAPA LIBRE CON SOPORTE TÁCTIL NATIVO (1 DEDO ARRASTRE / 2 DEDOS ZOOM) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <style>
         /* =========================================================
            ADN CROMÁTICO OFICIAL: SEPIA VINTAGE & MARRÓN SASTRE
@@ -600,7 +596,7 @@
         }
 
         /* =========================================================
-           MAPA DE GOOGLE LIBRE: DESPLAZAMIENTO FLUIDO CON 1 DEDO
+           MAPA OFICIAL GOOGLE MAPS
            ========================================================= */
         .map-card {
             background: var(--card-surface);
@@ -646,23 +642,11 @@
             position: relative;
         }
 
-        #alvearMap {
+        .map-box iframe {
             width: 100%;
             height: 100%;
-        }
-
-        .leaflet-popup-content-wrapper {
-            background: #FFFDF8 !important;
-            color: var(--text-main) !important;
-            border: 1.5px solid var(--gold-vintage) !important;
-            border-radius: 14px !important;
-            box-shadow: 0 8px 22px rgba(60, 40, 25, 0.22) !important;
-            font-family: var(--font-sans) !important;
-            padding: 2px !important;
-        }
-
-        .leaflet-popup-tip {
-            background: #FFFDF8 !important;
+            border: 0;
+            display: block;
         }
 
         /* =========================================================
@@ -986,9 +970,9 @@
                             <path fill="#231F20" d="M22.85,69.53l1.3-7.16,3.28.6c.67.12,1.19.29,1.57.51.38.22.65.5.83.84.17.34.23.68.17,1.01-.06.31-.21.58-.46.81-.25.23-.6.4-1.04.49.51.22.87.51,1.1.87.23.36.31.74.23,1.16-.06.34-.2.63-.43.89-.23.26-.48.44-.76.55-.28.11-.62.17-1.02.18-.4,0-.88-.04-1.43-.14l-3.33-.61ZM24.76,65.59l1.89.34c.51.09.89.13,1.12.12.31-.02.55-.1.73-.24.18-.14.29-.33.34-.59.04-.24.01-.46-.09-.67s-.28-.37-.53-.48c-.25-.11-.68-.23-1.31-.34l-1.75-.32-.39,2.16ZM24.16,68.9l2.18.4c.37.07.64.1.79.11.27,0,.51-.02.7-.07s.37-.16.51-.32.24-.34.28-.57c.05-.27,0-.51-.12-.74s-.34-.41-.62-.54c-.28-.13-.7-.25-1.26-.35l-2.02-.37-.45,2.46Z"/>
                             <path fill="#231F20" d="M33.34,71.6l4.01-6.97,1.26.11,3.01,7.56-1.33-.11-.85-2.28-3.7-.31-1.16,2.11-1.24-.11ZM36.15,68.84l3,.25-.75-2.09c-.23-.63-.4-1.15-.5-1.56-.15.46-.35.9-.59,1.34l-1.15,2.05Z"/>
                             <path fill="#231F20" d="M45.66,72.71l.37-7.27,1.17.06-.33,6.41,4.37.22-.04.86-5.55-.28Z"/>
-                            <path fill="#231F20" d="M55.75,72.98v-7.28h1.18v6.42h4.38v.86h-5.55Z"/>
+                            <path fill="#5575,72.98v-7.28h1.18v6.42h4.38v.86h-5.55Z"/>
                             <path fill="#231F20" d="M66.02,72.92l-.64-7.25,6.4-.56.08.86-5.23.46.2,2.22,4.9-.43.07.85-4.9.43.22,2.47,5.44-.48.08.86-6.61.58Z"/>
-                            <path fill="#231F20" d="M77.39,71.71l-1.1-7.2,3.9-.59c.78-.12,1.39-.15,1.82-.08.43.07.79.25,1.08.54.29.29.47.63.53,1.03.08.51-.06.97-.41,1.38-.35.41-.94.73-1.77.95.33.07.58.16.76.25.38.2.75.47,1.11.81l1.83,1.73-1.46.22-1.39-1.32c-.41-.38-.74-.67-.99-.86-.25-.2-.48-.33-.66-.39-.19-.07-.37-.1-.56-.11-.14,0-.35.02-.65.06l-1.35.21.49,3.2-1.16.18ZM77.94,67.51l2.5-.38c.53-.08.94-.19,1.23-.32.29-.14.49-.31.62-.54.13-.22.17-.45.13-.68-.05-.34-.25-.6-.58-.77s-.83-.21-1.48-.11l-2.78.42.36,2.38Z"/>
+                            <path fill="#75583F" d="M77.39,71.71l-1.1-7.2,3.9-.59c.78-.12,1.39-.15,1.82-.08.43.07.79.25,1.08.54.29.29.47.63.53,1.03.08.51-.06.97-.41,1.38-.35.41-.94.73-1.77.95.33.07.58.16.76.25.38.2.75.47,1.11.81l1.83,1.73-1.46.22-1.39-1.32c-.41-.38-.74-.67-.99-.86-.25-.2-.48-.33-.66-.39-.19-.07-.37-.1-.56-.11-.14,0-.35.02-.65.06l-1.35.21.49,3.2-1.16.18ZM77.94,67.51l2.5-.38c.53-.08.94-.19,1.23-.32.29-.14.49-.31.62-.54.13-.22.17-.45.13-.68-.05-.34-.25-.6-.58-.77s-.83-.21-1.48-.11l-2.78.42.36,2.38Z"/>
                             <path fill="#231F20" d="M88.48,66.62c-.39-1.14-.32-2.17.21-3.07.53-.9,1.39-1.56,2.57-1.96.78-.27,1.53-.35,2.26-.26.73.09,1.35.35,1.86.78s.89.99,1.12,1.68.28,1.38.12,2.05c-.16.67-.5,1.25-1.04,1.75s-1.17.87-1.9,1.12c-.79.27-1.55.36-2.28.26-.73-.1-1.35-.37-1.86-.8-.51-.43-.86-.95-1.07-1.56ZM89.63,66.24c.28.83.78,1.39,1.49,1.68.71.29,1.47.3,2.3.02s1.45-.76,1.82-1.43c.38-.67.41-1.44.11-2.33-.19-.56-.47-1.01-.85-1.35-.37-.34-.82-.55-1.35-.63-.52-.08-1.06-.02-1.62.17-.79.27-1.39.72-1.81,1.36-.42.64-.45,1.47-.09,2.51Z"/>
                             <path fill="#231F20" d="M100.6,63.74l1.02-.45c.17.33.39.56.65.72.26.15.6.23,1.03.23.43,0,.88-.09,1.36-.26.42-.15.78-.34,1.06-.56.28-.22.47-.45.57-.68.09-.24.1-.46.02-.67s-.22-.37-.43-.48c-.21-.11-.51-.15-.9-.13-.25,0-.79.08-1.61.21s-1.41.18-1.77.16c-.46-.03-.84-.13-1.12-.31-.29-.18-.49-.43-.6-.75-.13-.35-.12-.71,0-1.1s.4-.74.8-1.06c.4-.32.89-.59,1.45-.79.62-.22,1.19-.34,1.73-.35.53,0,.98.1,1.35.33.37.23.64.54.8.93l-1.04.45c-.21-.41-.53-.67-.93-.77-.41-.1-.93-.04-1.58.2s-1.12.52-1.35.83-.3.61-.2.89c.09.25.27.41.54.49.27.08.88.04,1.84-.12s1.63-.24,2.01-.23c.55,0,1,.11,1.33.31s.57.48.7.85.13.75,0,1.17c-.14.41-.41.8-.82,1.15-.41.35-.92.64-1.51.85-.76.27-1.42.41-2,.42-.58,0-1.08-.12-1.5-.38-.42-.26-.72-.61-.9-1.06Z"/>
                         </g>
@@ -1102,7 +1086,7 @@
             </div>
         </a>
 
-        <!-- MAPA OFICIAL GOOGLE MAPS: ARRASTRE FLUIDO CON 1 DEDO Y ZOOM CON PELLIZCO -->
+        <!-- MAPA OFICIAL GOOGLE MAPS DIRECTO (SIN RAYAS DE MOSAICOS NI ERRORES DE API) -->
         <div class="map-card">
             <div class="map-header">
                 <div class="map-title">
@@ -1113,18 +1097,46 @@
             </div>
             <div class="map-address-sub">Tres generaciones en el mismo lugar de Recoleta</div>
             <div class="map-box">
-                <div id="alvearMap"></div>
+                <iframe 
+                    src="https://maps.google.com/maps?q=Peluquer%C3%ADa+Alvear,+Av.+Callao+1979,+CABA&t=&z=17&ie=UTF8&iwloc=&output=embed" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
             </div>
         </div>
 
         <!-- BOTÓN: CÓMO LLEGAR (GOOGLE MAPS) -->
-        <a href="https://maps.app.goo.gl/dfnWMGrih7oTWPFt6" target="_blank" rel="noopener noreferrer" class="btn-card">
+        <a href="https://www.google.com/maps/place/Peluquer%C3%ADa+Alvear/@-34.5878819,-58.3874021,19z" target="_blank" rel="noopener noreferrer" class="btn-card">
             <div class="icon-box">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
             </div>
             <div class="btn-info">
                 <span class="btn-title">Abrir en Google Maps</span>
                 <span class="btn-desc">Indicaciones directas para llegar al salón</span>
+            </div>
+            <div class="arrow-box">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </div>
+        </a>
+
+        <!-- BOTÓN: PERFIL Y RESEÑAS EN GOOGLE CON SVG OFICIAL PERFECTO -->
+        <a href="https://share.google/KCNZiOHxglJok0QHL" target="_blank" rel="noopener noreferrer" class="btn-card">
+            <div class="icon-box">
+                <!-- SVG OFICIAL DE GOOGLE CON COLORES Y TRAZADO VECTORIAL EXACTO -->
+                <svg viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+            </div>
+            <div class="btn-info">
+                <div class="btn-title-row">
+                    <span class="btn-title">Perfil y Reseñas en Google</span>
+                    <span class="badge-pill gold">★ 4.9</span>
+                </div>
+                <span class="btn-desc">Más de 130 opiniones y reseñas en Google</span>
             </div>
             <div class="arrow-box">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -1160,7 +1172,7 @@
     </div>
 
     <!-- =========================================================
-         SCRIPTS: LISTA DE FOTOS, GESTOS, MAPA Y HORARIOS EN VIVO
+         SCRIPTS: LISTA DE FOTOS, GESTOS, LIGHTBOX Y HORARIOS EN VIVO
          ========================================================= -->
     <script>
         /* LISTA MAESTRA DE FOTOS (ÚNICAS Y ORDENADAS) */
@@ -1335,55 +1347,6 @@
             if (e.key === 'Escape') closeLightbox();
         });
 
-        // INICIALIZACIÓN DEL MAPA CON GOOGLE MAPS TILES (DESPLAZAMIENTO FLUIDO CON 1 DEDO Y ZOOM CON 2 DEDOS)
-        function initMap() {
-            const lat = -34.58783;
-            const lng = -58.38870;
-
-            const map = L.map('alvearMap', {
-                center: [lat, lng],
-                zoom: 16,
-                zoomControl: true,
-                scrollWheelZoom: true,
-                dragging: true,   // 1 dedo o ratón desplaza el mapa libremente
-                touchZoom: true   // 2 dedos hacen zoom pellizcando
-            });
-
-            // Capa nativa de Google Maps Roadmap (100% libre, sin API key ni trabas)
-            L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-                maxZoom: 20,
-                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-                attribution: '&copy; Google Maps'
-            }).addTo(map);
-
-            // Marcador exacto con el pin oficial de Google Maps
-            const redPinIcon = L.divIcon({
-                className: 'custom-google-pin',
-                html: `
-                    <div style="filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35)); cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        <svg viewBox="0 0 24 24" width="38" height="38" fill="#EA4335">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                        </svg>
-                    </div>
-                `,
-                iconSize: [38, 38],
-                iconAnchor: [19, 36],
-                popupAnchor: [0, -34]
-            });
-
-            L.marker([lat, lng], { icon: redPinIcon }).addTo(map)
-                .bindPopup(`
-                    <div style="text-align: center; padding: 4px 2px;">
-                        <strong style="font-family: var(--font-serif); font-size: 0.98rem; color: #3F2918; display: block; margin-bottom: 2px;">Peluquería Alvear</strong>
-                        <span style="display: block; font-size: 0.78rem; font-weight: 600; color: #75583F; margin-bottom: 3px;">Tres generaciones en el mismo lugar de Recoleta</span>
-                        <span style="display: block; font-size: 0.74rem; color: #7E6D62;">Av. Callao 1979, C1024 CABA</span>
-                    </div>
-                `)
-                .openPopup();
-
-            setTimeout(() => { map.invalidateSize(); }, 300);
-        }
-
         // ESTADO DE APERTURA EN VIVO (HORARIO DE BUENOS AIRES)
         function updateStoreStatus() {
             const now = new Date();
@@ -1421,7 +1384,6 @@
         window.addEventListener('DOMContentLoaded', () => {
             if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             renderGalleryTrack();
-            initMap();
             updateStoreStatus();
             requestAnimationFrame(() => document.body.classList.remove('preload'));
         });
