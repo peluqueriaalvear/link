@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peluquería Alvear | Barbería Tradicional en Recoleta (Desde 1968)</title>
+    <meta name="description" content="Peluquería tradicional de caballeros y niños fundada en 1968 en Recoleta. Más de 55 años de oficio a peine y tijera. Av. Callao 1979.">
+
+    <!-- TIPOGRAFÍAS EDITORIALES CLÁSICAS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- MOTOR DE MAPA LIBRE CON SOPORTE TÁCTIL NATIVO (1 DEDO ARRASTRE / 2 DEDOS ZOOM) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* =========================================================
+           ADN CROMÁTICO OFICIAL: SEPIA VINTAGE & MARRÓN SASTRE
+           ========================================================= */
+        :root {
+            --bg-sepia-soft: #FFFDF7;
+            --bg-sepia-base: #FFF2D4;
+            --bg-sepia-dark: #E9D2A3;
+            
+            --brand-brown: #75583F;
+            --brand-brown-dark: #3F2918;
+            --brand-brown-light: #8E6847;
+            --brand-dark: #1E1A1B;
+            
+            --gold-vintage: #C89D66;
+            --gold-light: #E8CA9B;
+            
+            --card-surface: #FFFFFF;
+            --card-surface-hover: #FFFDF9;
+            --border-card: rgba(117, 88, 63, 0.22);
+            --border-card-hover: rgba(117, 88, 63, 0.55);
+            
+            --text-main: #1E1A1B;
+            --text-muted: #564438;
+            --text-subtle: #7E6D62;
+            
+            --shadow-card: 0 8px 24px -3px rgba(95, 65, 40, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04);
+            --shadow-hero: 0 12px 30px -3px rgba(85, 55, 30, 0.38), 0 0 16px rgba(200, 157, 102, 0.25);
+            
+            --font-display: 'Cinzel', serif;
+            --font-serif: 'Playfair Display', Georgia, serif;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body.preload * {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            background-color: var(--bg-sepia-base);
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: transparent;
+            color: var(--text-main);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 26px 16px 44px;
+            overflow-x: hidden;
+            position: relative;
+            letter-spacing: -0.01em;
+            touch-action: pan-y pinch-zoom;
+        }
+
+        /* FONDO PAPEL SEPIA RETRO */
+        .vintage-bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            background: radial-gradient(circle at 50% 10%, #FFFDF7 0%, #FFF2D4 52%, #E9D2A3 100%);
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .vintage-vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 140px rgba(117, 88, 63, 0.18);
+            pointer-events: none;
+        }
+
+        /* DOBLE FILETE PERIMETRAL VINTAGE */
+        .frame-line {
+            position: absolute;
+            top: 7px;
+            bottom: 7px;
+            left: 7px;
+            right: 7px;
+            border: 1.5px solid rgba(117, 88, 63, 0.35);
+            outline: 1px solid rgba(200, 157, 102, 0.4);
+            outline-offset: -4px;
+            border-radius: 18px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hub-container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            z-index: 1;
+        }
+
+        /* =========================================================
+           ENCABEZADO: RESPIRACIÓN Y TIPOGRAFÍA EDITORIAL
+           ========================================================= */
+        .brand-header {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .heritage-tag {
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--brand-brown);
+            padding: 5px 18px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(117, 88, 63, 0.28);
+            box-shadow: 0 3px 8px rgba(117, 88, 63, 0.08);
+            margin-bottom: 8px;
+        }
+
+        .logo-stage {
+            width: 100%;
+            max-width: 235px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 16px 0 22px;
+            filter: drop-shadow(0 5px 15px rgba(117, 88, 63, 0.16));
+            transition: transform 0.3s ease;
+        }
+
+        .logo-stage:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* =========================================================
+           BIO EN PC: FRASES LARGAS EN 1 SOLA LÍNEA SIN CORTES
+           ========================================================= */
+        .brand-bio {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .bio-lead {
+            font-family: var(--font-display);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--brand-brown-dark);
+            line-height: 1.35;
+            white-space: nowrap;
+        }
+
+        .bio-sub {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+
+        .bio-location {
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--brand-brown-light);
+            font-weight: 600;
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+
+        .social-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border-card);
+            color: var(--brand-brown);
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(117, 88, 63, 0.08);
+            transition: all 0.25s ease;
+        }
+
+        .social-btn:hover {
+            background: var(--brand-brown);
+            color: #FFFFFF;
+            border-color: var(--brand-brown);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(117, 88, 63, 0.24);
+        }
+
+        .social-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* =========================================================
+           BOTONES & CARDS
+           ========================================================= */
+        .btn-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 16px 19px;
+            background: var(--card-surface);
+            border: 1.5px solid var(--border-card);
+            border-radius: 19px;
+            text-decoration: none;
+            color: var(--text-main);
+            box-shadow: var(--shadow-card);
+            transition: all 0.25s ease;
+            position: relative;
+            user-select: none;
+        }
+
+        .btn-card:hover {
+            background: var(--card-surface-hover);
+            border-color: var(--border-card-hover);
+            box-shadow: 0 10px 26px rgba(117, 88, 63, 0.14);
+            transform: translateY(-2px);
+        }
+
+        /* HERO CARD WHATSAPP */
+        .btn-hero {
+            background: linear-gradient(135deg, #75583F 0%, #46301F 100%);
+            border: 2px solid var(--gold-vintage);
+            box-shadow: var(--shadow-hero);
+            color: #FFFFFF;
+            padding: 17px 20px;
+            overflow: hidden;
+        }
+
+        .btn-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -130%;
+            width: 70%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(232, 202, 155, 0.2) 40%, rgba(255, 255, 255, 0.45) 50%, rgba(232, 202, 155, 0.2) 60%, transparent 100%);
+            transform: skewX(-25deg);
+            animation: jewelSweep 5.2s infinite ease-in-out;
+        }
+
+        @keyframes jewelSweep {
+            0%, 50% { left: -130%; }
+            85%, 100% { left: 190%; }
+        }
+
+        .btn-hero:hover {
+            background: linear-gradient(135deg, #644933 0%, #382415 100%);
+            border-color: var(--gold-light);
+            box-shadow: 0 14px 34px rgba(65, 40, 20, 0.4);
+        }
+
+        .btn-hero .btn-title { color: #FFFFFF; }
+        .btn-hero .btn-desc { color: #EFE4D6; font-weight: 500; }
+
+        .icon-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            border-radius: 14px;
+            background: var(--bg-sepia-base);
+            border: 1.5px solid var(--border-card);
+            color: var(--brand-brown);
+            transition: all 0.25s ease;
+        }
+
+        .btn-card:hover .icon-box {
+            background: #EED7B5;
+            border-color: var(--brand-brown);
+        }
+
+        .icon-box.hero-gold {
+            background: linear-gradient(135deg, #E8CA9B 0%, #C89D66 100%);
+            border: 1.5px solid rgba(255, 255, 255, 0.7);
+            color: #231F20;
+        }
+
+        .icon-box svg {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+
+        .btn-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+            gap: 2px;
+        }
+
+        .btn-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-title {
+            font-family: var(--font-serif);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .badge-pill {
+            font-family: var(--font-display);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(117, 88, 63, 0.1);
+            color: var(--brand-brown);
+            border: 1px solid rgba(117, 88, 63, 0.25);
+            text-transform: uppercase;
+        }
+
+        .badge-pill.open-now {
+            background: rgba(34, 139, 34, 0.12);
+            color: #1A6C2E;
+            border-color: rgba(34, 139, 34, 0.35);
+        }
+
+        .badge-pill.gold {
+            background: #EED7B5;
+            color: #4A3320;
+            border-color: #C89D66;
+        }
+
+        .btn-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .arrow-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 50%;
+            background: var(--bg-sepia-base);
+            border: 1px solid var(--border-card);
+            color: var(--brand-brown);
+            transition: all 0.25s ease;
+        }
+
+        .btn-card:hover .arrow-box {
+            background: var(--brand-brown);
+            color: #FFFFFF;
+            border-color: var(--brand-brown);
+        }
+
+        .btn-hero .arrow-box {
+            background: rgba(255, 255, 255, 0.18);
+            color: #FFFFFF;
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .btn-hero:hover .arrow-box {
+            background: #FFFFFF;
+            color: var(--brand-brown-dark);
+        }
+
+        .arrow-box svg {
+            width: 15px;
+            height: 15px;
+            stroke-width: 2.6;
+        }
+
+        /* =========================================================
+           TARJETA DE HORARIOS
+           ========================================================= */
+        .hours-card {
+            background: var(--card-surface);
+            border: 1.5px solid var(--border-card);
+            border-radius: 19px;
+            padding: 16px 19px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hours-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hours-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--brand-brown-dark);
+        }
+
+        .hours-table {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-top: 4px;
+            border-top: 1px dashed rgba(117, 88, 63, 0.22);
+        }
+
+        .hours-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.84rem;
+            color: var(--text-muted);
+        }
+
+        .hours-row.active-day {
+            font-weight: 700;
+            color: var(--brand-brown-dark);
+        }
+
+        .hours-row span.time {
+            font-family: var(--font-sans);
+            font-weight: 600;
+        }
+
+        /* =========================================================
+           CARRUSEL RESPONSIVO
+           ========================================================= */
+        .gallery-card {
+            background: var(--card-surface);
+            border: 1.5px solid var(--border-card);
+            border-radius: 20px;
+            padding: 16px 16px 18px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+
+        .gallery-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .gallery-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--brand-brown-dark);
+        }
+
+        .gallery-controls-pc {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-arrow-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bg-sepia-base);
+            border: 1px solid var(--border-card);
+            color: var(--brand-brown);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-arrow-btn:hover {
+            background: var(--brand-brown);
+            color: #FFFFFF;
+        }
+
+        .gallery-track {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+            padding: 4px 2px 6px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .gallery-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gallery-item {
+            flex: 0 0 148px;
+            height: 188px;
+            border-radius: 14px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            scroll-snap-align: start;
+            border: 1.5px solid rgba(117, 88, 63, 0.18);
+            background: var(--bg-sepia-base);
+            box-shadow: 0 3px 10px rgba(95, 65, 40, 0.08);
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold-vintage);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* =========================================================
+           MAPA DE GOOGLE LIBRE: DESPLAZAMIENTO FLUIDO CON 1 DEDO
+           ========================================================= */
+        .map-card {
+            background: var(--card-surface);
+            border: 1.5px solid var(--border-card);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .map-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2px;
+        }
+
+        .map-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--brand-brown-dark);
+        }
+
+        .map-address-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .map-box {
+            width: 100%;
+            height: 275px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(117, 88, 63, 0.22);
+            background: #F8F5EE;
+            position: relative;
+        }
+
+        #alvearMap {
+            width: 100%;
+            height: 100%;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background: #FFFDF8 !important;
+            color: var(--text-main) !important;
+            border: 1.5px solid var(--gold-vintage) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 8px 22px rgba(60, 40, 25, 0.22) !important;
+            font-family: var(--font-sans) !important;
+            padding: 2px !important;
+        }
+
+        .leaflet-popup-tip {
+            background: #FFFDF8 !important;
+        }
+
+        /* =========================================================
+           MODAL LIGHTBOX AVANZADO (ZOOM CON DEDOS & FLECHAS)
+           ========================================================= */
+        .lightbox-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(35, 31, 32, 0.94);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+
+        .lightbox-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 460px;
+            width: 100%;
+            background: #111;
+            border: 2px solid var(--gold-vintage);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lightbox-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: rgba(20, 18, 19, 0.85);
+            border-bottom: 1px solid rgba(200, 157, 102, 0.25);
+            z-index: 5;
+        }
+
+        .lightbox-counter {
+            font-family: var(--font-display);
+            font-size: 0.76rem;
+            color: #E8CA9B;
+            letter-spacing: 0.12em;
+            font-weight: 700;
+        }
+
+        .btn-close-lightbox {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFF;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-close-lightbox:hover {
+            background: var(--brand-brown);
+            border-color: var(--gold-vintage);
+        }
+
+        .lightbox-img-wrap {
+            width: 100%;
+            height: 70vh;
+            max-height: 520px;
+            background: #0D0C0D;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            touch-action: none;
+        }
+
+        .lightbox-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+
+        .lb-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 42px;
+            height: 42px;
+            background: rgba(35, 31, 32, 0.75);
+            border: 1.5px solid var(--gold-vintage);
+            color: #FFF2D4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.25s ease;
+        }
+
+        .lb-nav-btn:hover {
+            background: var(--brand-brown);
+            color: #FFFFFF;
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .lb-prev { left: 10px; }
+        .lb-next { right: 10px; }
+
+        /* =========================================================
+           PIE DE PÁGINA EDITORIAL & CINTA DE AUTOR
+           ========================================================= */
+        .hub-footer {
+            margin-top: 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ribbon-signature {
+            background: linear-gradient(135deg, #75583F 0%, #46301F 100%);
+            border: 1px solid var(--gold-vintage);
+            padding: 8px 24px;
+            border-radius: 999px;
+            box-shadow: 0 4px 14px rgba(117, 88, 63, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signature-text {
+            font-family: 'Playfair Display', cursive, serif;
+            font-style: italic;
+            font-size: 1.12rem;
+            color: #FFF2D4;
+            letter-spacing: 0.04em;
+        }
+
+        .footer-legal-title {
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--brand-brown);
+            font-weight: 700;
+        }
+
+        .footer-legal-sub {
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            color: var(--text-subtle);
+            font-weight: 600;
+        }
+
+        /* =========================================================
+           MODO MÓVIL (<= 480PX): BALANCEADO Y PROPORCIONADO
+           ========================================================= */
+        @media (max-width: 480px) {
+            body {
+                padding: 22px 14px 40px;
+            }
+            .hub-container {
+                gap: 15px;
+            }
+            .frame-line {
+                top: 6px;
+                bottom: 6px;
+                left: 6px;
+                right: 6px;
+                border: 1.5px solid rgba(117, 88, 63, 0.4);
+                outline: 1px solid rgba(200, 157, 102, 0.45);
+                outline-offset: -3.5px;
+                border-radius: 16px;
+            }
+            .heritage-tag {
+                font-size: 0.68rem;
+                letter-spacing: 0.18em;
+                padding: 4px 14px;
+            }
+            .logo-stage {
+                max-width: 210px;
+                margin: 14px 0 18px;
+            }
+            
+            .brand-bio {
+                gap: 7px;
+                max-width: 100%;
+            }
+            .bio-lead {
+                white-space: normal;
+                text-wrap: balance;
+                font-size: 0.78rem;
+                line-height: 1.42;
+                max-width: 285px;
+            }
+            .bio-sub {
+                white-space: normal;
+                text-wrap: balance;
+                font-size: 0.84rem;
+                line-height: 1.42;
+                max-width: 310px;
+            }
+            .bio-location {
+                white-space: normal;
+                text-wrap: balance;
+                font-size: 0.68rem;
+                line-height: 1.38;
+                letter-spacing: 0.13em;
+                max-width: 270px;
+            }
+
+            .social-bar {
+                margin-top: 8px;
+                gap: 14px;
+            }
+            .social-btn {
+                width: 42px;
+                height: 42px;
+            }
+            .btn-card {
+                padding: 16px 18px;
+                border-radius: 18px;
+                gap: 13px;
+            }
+            .btn-hero {
+                padding: 17px 19px;
+            }
+            .btn-title {
+                font-size: 1.02rem;
+            }
+            .btn-desc {
+                font-size: 0.78rem;
+            }
+            .hours-card {
+                padding: 16px 18px;
+            }
+            .gallery-card {
+                padding: 16px 15px 18px;
+            }
+            .gallery-item {
+                flex: 0 0 142px;
+                height: 182px;
+            }
+            .map-card {
+                padding: 15px;
+            }
+            .map-box {
+                height: 260px;
+            }
+            .gallery-controls-pc {
+                display: none;
+            }
+            .lb-nav-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 17px;
+            }
+        }
+    </style>
+</head>
+<body class="preload">
+
+    <!-- FONDO Y ORNAMENTACIÓN SEPIA -->
+    <div class="vintage-bg-canvas">
+        <div class="vintage-vignette"></div>
+    </div>
+    <div class="frame-line"></div>
+
+    <!-- CONTENEDOR MAESTRO -->
+    <main class="hub-container">
+
+        <!-- ENCABEZADO CON LOGO OFICIAL SVG -->
+        <header class="brand-header">
+            <div class="heritage-tag">Inaugurado en 1968 · Recoleta</div>
+            
+            <div class="logo-stage">
+                <!-- SVG OFICIAL VECTORIAL -->
+                <svg class="logo-svg" viewBox="0 0 108.76 72.99" xmlns="http://www.w3.org/2000/svg">
+                    <g>
+                        <g>
+                            <path fill="#231F20" d="M2.75,17.16L0,10.42l3.1-1.27c.55-.22.97-.37,1.28-.45.43-.11.81-.14,1.14-.1.34.04.64.17.92.38.28.21.49.48.62.82.23.57.21,1.15-.07,1.73-.28.58-1.01,1.11-2.17,1.58l-2.11.86,1.12,2.74-1.09.44ZM2.4,13.18l2.13-.87c.7-.29,1.16-.6,1.37-.93.21-.33.23-.7.07-1.09-.12-.28-.3-.49-.56-.62-.26-.13-.54-.17-.85-.12-.2.03-.55.15-1.04.35l-2.1.86.98,2.41Z"/>
+                            <path fill="#231F20" d="M13.74,12.9l-1.99-7,6.18-1.76.23.83-5.05,1.43.61,2.14,4.73-1.34.23.82-4.73,1.34.68,2.38,5.25-1.49.23.83-6.38,1.81Z"/>
+                            <path fill="#231F20" d="M25.15,9.91l-1.3-7.16,1.16-.21,1.14,6.32,4.31-.78.15.85-5.46.99Z"/>
+                            <path fill="#231F20" d="M40.71.45l1.17-.09.32,4.19c.06.73,0,1.32-.17,1.76-.17.44-.5.82-1.01,1.13-.5.31-1.18.5-2.04.56s-1.52,0-2.06-.19-.95-.5-1.21-.93c-.26-.43-.42-1.02-.48-1.79l-.32-4.19,1.17-.09.32,4.19c.05.63.16,1.09.32,1.38.17.29.43.5.79.63.36.14.79.18,1.3.14.86-.07,1.46-.27,1.81-.62.34-.35.48-.98.41-1.89l-.32-4.19Z"/>
+                            <path fill="#231F20" d="M54.39,6.63c.55.31,1.05.53,1.51.68l-.35.67c-.64-.19-1.28-.49-1.91-.89-.66.3-1.39.45-2.18.45s-1.53-.16-2.19-.48c-.65-.32-1.16-.76-1.51-1.34-.35-.58-.53-1.23-.53-1.95s.18-1.37.53-1.96c.36-.59.86-1.04,1.52-1.35.66-.31,1.39-.46,2.2-.46s1.56.16,2.22.48,1.16.77,1.51,1.34c.35.57.52,1.22.52,1.94,0,.6-.11,1.14-.33,1.62-.22.48-.56.89-1.01,1.25ZM51.8,5.4c.68.16,1.24.39,1.68.7.69-.52,1.04-1.29,1.04-2.33,0-.59-.12-1.1-.37-1.54s-.6-.78-1.07-1.03c-.47-.24-1-.36-1.59-.36-.88,0-1.6.25-2.18.74-.58.49-.87,1.23-.87,2.2s.29,1.67.86,2.18c.57.51,1.3.76,2.19.76.42,0,.82-.06,1.19-.19-.37-.19-.76-.33-1.16-.42l.28-.7Z"/>
+                            <path fill="#231F20" d="M66.96.49l1.17.06-.2,4.2c-.04.73-.16,1.31-.39,1.73-.22.42-.6.75-1.14,1-.54.24-1.24.35-2.09.3s-1.51-.19-2.02-.45-.88-.62-1.08-1.07c-.21-.46-.29-1.07-.25-1.84l.2-4.2,1.17.06-.2,4.2c-.03.63.02,1.1.15,1.41.13.31.36.55.7.73.34.18.76.28,1.27.3.86.04,1.49-.09,1.87-.39.38-.3.6-.91.64-1.82l.2-4.2Z"/>
+                            <path fill="#231F20" d="M72.9,8.53l.92-7.22,6.37.82-.11.85-5.21-.67-.28,2.21,4.88.62-.11.85-4.88-.62-.31,2.46,5.41.69-.11.85-6.58-.84Z"/>
+                            <path fill="#231F20" d="M84.35,10.61l1.46-7.13,3.86.79c.78.16,1.35.34,1.73.56.38.21.65.5.83.88.18.37.22.76.14,1.15-.1.51-.39.89-.86,1.16-.47.26-1.13.36-1.99.28.28.18.49.35.62.5.28.32.54.7.76,1.14l1.12,2.25-1.45-.3-.85-1.72c-.25-.5-.46-.88-.63-1.15-.17-.27-.33-.47-.49-.6-.15-.13-.32-.23-.49-.3-.13-.05-.34-.1-.63-.17l-1.34-.27-.65,3.17-1.15-.24ZM86.32,6.86l2.48.51c.53.11.95.15,1.26.12.32-.03.57-.12.77-.29.19-.17.32-.36.36-.59.07-.34-.02-.65-.28-.92s-.7-.48-1.35-.62l-2.75-.57-.48,2.36Z"/>
+                            <path fill="#231F20" d="M96.13,13.68l2.42-6.87,1.11.39-2.42,6.87-1.11-.39Z"/>
+                            <path fill="#231F20" d="M101.22,15.74l6.17-5.16,1.15.53.23,8.13-1.22-.57v-2.44s-3.38-1.57-3.38-1.57l-1.81,1.59-1.13-.53ZM104.8,14.11l2.73,1.27v-2.22c.01-.67.03-1.22.07-1.63-.3.38-.64.73-1.02,1.06l-1.79,1.52Z"/>
+                        </g>
+                        <g>
+                            <path fill="#231F20" d="M7.31,62.01l.97.7c-.55.62-1.2.99-1.96,1.1-.75.12-1.55-.02-2.4-.4s-1.52-.86-1.93-1.4c-.42-.54-.64-1.15-.68-1.83-.04-.68.09-1.34.37-1.97.31-.69.74-1.22,1.3-1.59.55-.37,1.19-.55,1.9-.55.72,0,1.43.16,2.15.49.81.37,1.42.84,1.82,1.43.4.59.57,1.24.51,1.95l-1.15-.27c.03-.57-.08-1.04-.34-1.42-.26-.38-.66-.69-1.2-.94-.62-.28-1.2-.39-1.73-.34-.53.06-.97.25-1.33.59-.36.34-.63.72-.83,1.16-.25.56-.38,1.1-.36,1.61.01.51.18.97.51,1.37s.74.71,1.24.93c.6.27,1.17.36,1.72.26.54-.1,1.02-.39,1.42-.88Z"/>
+                            <path fill="#231F20" d="M10.87,65.98l5.59-5.78,1.2.41,1.08,8.07-1.27-.43-.27-2.42-3.51-1.2-1.64,1.77-1.18-.41ZM14.27,63.98l2.85.98-.22-2.21c-.07-.67-.1-1.22-.11-1.63-.26.4-.56.79-.9,1.16l-1.62,1.7Z"/>
+                            <path fill="#231F20" d="M22.85,69.53l1.3-7.16,3.28.6c.67.12,1.19.29,1.57.51.38.22.65.5.83.84.17.34.23.68.17,1.01-.06.31-.21.58-.46.81-.25.23-.6.4-1.04.49.51.22.87.51,1.1.87.23.36.31.74.23,1.16-.06.34-.2.63-.43.89-.23.26-.48.44-.76.55-.28.11-.62.17-1.02.18-.4,0-.88-.04-1.43-.14l-3.33-.61ZM24.76,65.59l1.89.34c.51.09.89.13,1.12.12.31-.02.55-.1.73-.24.18-.14.29-.33.34-.59.04-.24.01-.46-.09-.67s-.28-.37-.53-.48c-.25-.11-.68-.23-1.31-.34l-1.75-.32-.39,2.16ZM24.16,68.9l2.18.4c.37.07.64.1.79.11.27,0,.51-.02.7-.07s.37-.16.51-.32.24-.34.28-.57c.05-.27,0-.51-.12-.74s-.34-.41-.62-.54c-.28-.13-.7-.25-1.26-.35l-2.02-.37-.45,2.46Z"/>
+                            <path fill="#231F20" d="M33.34,71.6l4.01-6.97,1.26.11,3.01,7.56-1.33-.11-.85-2.28-3.7-.31-1.16,2.11-1.24-.11ZM36.15,68.84l3,.25-.75-2.09c-.23-.63-.4-1.15-.5-1.56-.15.46-.35.9-.59,1.34l-1.15,2.05Z"/>
+                            <path fill="#231F20" d="M45.66,72.71l.37-7.27,1.17.06-.33,6.41,4.37.22-.04.86-5.55-.28Z"/>
+                            <path fill="#231F20" d="M55.75,72.98v-7.28h1.18v6.42h4.38v.86h-5.55Z"/>
+                            <path fill="#231F20" d="M66.02,72.92l-.64-7.25,6.4-.56.08.86-5.23.46.2,2.22,4.9-.43.07.85-4.9.43.22,2.47,5.44-.48.08.86-6.61.58Z"/>
+                            <path fill="#231F20" d="M77.39,71.71l-1.1-7.2,3.9-.59c.78-.12,1.39-.15,1.82-.08.43.07.79.25,1.08.54.29.29.47.63.53,1.03.08.51-.06.97-.41,1.38-.35.41-.94.73-1.77.95.33.07.58.16.76.25.38.2.75.47,1.11.81l1.83,1.73-1.46.22-1.39-1.32c-.41-.38-.74-.67-.99-.86-.25-.2-.48-.33-.66-.39-.19-.07-.37-.1-.56-.11-.14,0-.35.02-.65.06l-1.35.21.49,3.2-1.16.18ZM77.94,67.51l2.5-.38c.53-.08.94-.19,1.23-.32.29-.14.49-.31.62-.54.13-.22.17-.45.13-.68-.05-.34-.25-.6-.58-.77s-.83-.21-1.48-.11l-2.78.42.36,2.38Z"/>
+                            <path fill="#231F20" d="M88.48,66.62c-.39-1.14-.32-2.17.21-3.07.53-.9,1.39-1.56,2.57-1.96.78-.27,1.53-.35,2.26-.26.73.09,1.35.35,1.86.78s.89.99,1.12,1.68.28,1.38.12,2.05c-.16.67-.5,1.25-1.04,1.75s-1.17.87-1.9,1.12c-.79.27-1.55.36-2.28.26-.73-.1-1.35-.37-1.86-.8-.51-.43-.86-.95-1.07-1.56ZM89.63,66.24c.28.83.78,1.39,1.49,1.68.71.29,1.47.3,2.3.02s1.45-.76,1.82-1.43c.38-.67.41-1.44.11-2.33-.19-.56-.47-1.01-.85-1.35-.37-.34-.82-.55-1.35-.63-.52-.08-1.06-.02-1.62.17-.79.27-1.39.72-1.81,1.36-.42.64-.45,1.47-.09,2.51Z"/>
+                            <path fill="#231F20" d="M100.6,63.74l1.02-.45c.17.33.39.56.65.72.26.15.6.23,1.03.23.43,0,.88-.09,1.36-.26.42-.15.78-.34,1.06-.56.28-.22.47-.45.57-.68.09-.24.1-.46.02-.67s-.22-.37-.43-.48c-.21-.11-.51-.15-.9-.13-.25,0-.79.08-1.61.21s-1.41.18-1.77.16c-.46-.03-.84-.13-1.12-.31-.29-.18-.49-.43-.6-.75-.13-.35-.12-.71,0-1.1s.4-.74.8-1.06c.4-.32.89-.59,1.45-.79.62-.22,1.19-.34,1.73-.35.53,0,.98.1,1.35.33.37.23.64.54.8.93l-1.04.45c-.21-.41-.53-.67-.93-.77-.41-.1-.93-.04-1.58.2s-1.12.52-1.35.83-.3.61-.2.89c.09.25.27.41.54.49.27.08.88.04,1.84-.12s1.63-.24,2.01-.23c.55,0,1,.11,1.33.31s.57.48.7.85.13.75,0,1.17c-.14.41-.41.8-.82,1.15-.41.35-.92.64-1.51.85-.76.27-1.42.41-2,.42-.58,0-1.08-.12-1.5-.38-.42-.26-.72-.61-.9-1.06Z"/>
+                        </g>
+                    </g>
+                    <g>
+                        <path fill="#75583F" d="M20.78,43.7l-1.23,1.07c-.79.6-1.34,1.05-2.41,1.6-1.84.94-3.19,1.63-5.17,2.14-2.3.6-4.14.61-5.39.52-1.4-.11-2.22-.36-2.95-.81-.38-.24-1.24-.78-1.7-1.84-.25-.59-.61-1.88,0-2.36.44-.35,1.16-.11,1.25-.07.1.04.66.23.89.74.19.43,0,.7,0,1.25.01.83.47,1.48.66,1.7.2.22.77.74,3.54.44,2.46-.26,4.36-.92,5.39-1.33,1.35-.53,2.34-1.07,2.95-1.4,1.48-.81,2.9-1.43,3.78-2.09l.38.46ZM20.84,43.76c1.34.99,2.67,1.75,3.99,2.29,1.34.55,2.72.91,4.17,1.08-.09.21-.26.68-.53,1.43-.26.74-.47,1.34-.64,1.78l3.34-.5,1.06-2.43c1.65-.15,3.13-.64,4.39-1.47,1.26-.82,1.9-1.56,1.9-2.22-.02-.05-.05-.08-.08-.11-.02-.02-.05-.03-.06-.03-.12,0-.35.2-.71.58-1.44,1.55-3.16,2.37-5.15,2.49,2.41-6.38,4.89-12.01,7.45-16.88,2.55-4.87,5.34-9.31,8.33-13.33-3.08,1.47-5.98,3.34-8.68,5.59-2.7,2.26-5.87,5.62-9.5,10.05-1.06-2.09-2.35-3.72-3.87-4.84-1.52-1.14-3.11-1.7-4.81-1.7-1.88,0-3.43.67-4.65,2.02-1.23,1.34-1.84,3.08-1.84,5.24,0,1.93.44,3.75,1.32,5.5M17.54,38.88c-.68-1.37-1.03-2.88-1.03-4.54,0-2.08.59-3.84,1.76-5.27,1.18-1.43,2.6-2.16,4.28-2.16,1.49,0,2.84.49,4.04,1.44s2.23,2.37,3.08,4.25c-.36.44-.91,1.11-1.64,2-3.04,3.72-5.43,6.47-7.2,8.24-1.5-1.29-2.6-2.61-3.29-3.98ZM30.29,42.66c-.23,1.23-.58,2.5-1.05,3.81-1.56-.17-2.99-.52-4.28-1.05-1.29-.55-2.49-1.28-3.6-2.2,1.46-1.5,3.52-3.86,6.18-7.07,1.06-1.28,1.87-2.25,2.41-2.88.23.82.41,1.7.52,2.63.11.94.17,1.93.17,2.99,0,1.29-.12,2.55-.35,3.78ZM30.89,42.7c.11-.74.18-1.44.24-2.08.05-.65.08-1.26.08-1.84,0-1.08-.06-2.13-.2-3.13-.12-1.02-.32-1.99-.58-2.91,2.9-3.7,5.63-6.72,8.18-9.08,2.54-2.34,4.92-4.04,7.15-5.07-3.29,3.99-6.15,7.95-8.58,11.9-2.43,3.93-4.52,8-6.3,12.2Z"/>
+                            <path fill="#75583F" d="M41.77,39.9c-.75.86-1.53,1.82-2.33,2.86s-1.28,1.57-1.43,1.57c-.05,0-.1-.02-.14-.06-.04-.04-.06-.08-.06-.13,0-.12.07-.29.19-.5.13-.21.39-.56.77-1.05l1.33-1.61c.85-1.02,1.61-1.97,2.3-2.85.69-.89,1.14-1.49,1.34-1.81l8.27-14.25,2.72-.41-12.91,22.76c-.89,1.56-1.45,2.61-1.69,3.14s-.36.95-.36,1.25c0,.24.07.45.21.62s.32.26.54.26c.5,0,1.07-.24,1.71-.72s1.74-1.6,3.33-3.35c.31-.35.68-.79,1.11-1.33.42-.54.7-.81.82-.81.07,0,.13.02.17.07.05.05.07.1.07.16,0,.14-.12.36-.35.68-.23.32-.76.95-1.58,1.89-1.4,1.59-2.47,2.66-3.19,3.22-.72.55-1.36.83-1.92.83-.68,0-1.23-.27-1.65-.8-.42-.53-.62-1.24-.62-2.14,0-1.23,1.01-3.53,3.03-6.91l.33-.59Z"/>
+                            <path fill="#75583F" d="M59.8,45.88c.05,0,.17.02.34.07.17.05.3.07.38.07.5,0,1.07-.19,1.7-.57.63-.38,1.19-.87,1.7-1.48l.55-.7s.06-.06.15-.09.16-.05.21-.05c.04,0,.07.01.09.05.02.03.03.11.03.23,0,.09,0,.15-.01.17,0,.02-.02.04-.03.06l-.45.61c-.65.8-1.34,1.41-2.05,1.81-.71.4-1.45.6-2.23.6-.23,0-.42,0-.56-.02-.14-.01-.28-.03-.42-.05-1.16,1.2-2.28,2.11-3.36,2.75s-2.05.95-2.93.95c-.67,0-1.2-.29-1.61-.86s-.6-1.34-.6-2.3c0-1.32.66-2.96,1.98-4.93.12-.18.21-.32.27-.41.61-.95,1.05-1.7,1.3-2.25.25-.55.38-.99.38-1.34,0-.18-.04-.31-.12-.4-.08-.08-.22-.13-.41-.13-.44,0-1.03.34-1.79,1.01-.76.67-1.8,1.82-3.12,3.42-.25.3-.54.68-.88,1.14-.57.73-.93,1.09-1.08,1.09-.05,0-.1-.02-.14-.06-.04-.04-.06-.08-.06-.13,0-.12.07-.29.19-.5.13-.21.39-.56.77-1.05l1.33-1.61c1.39-1.67,2.43-2.76,3.11-3.29.68-.52,1.32-.78,1.92-.78.56,0,1.01.22,1.34.67s.5,1.03.5,1.76c0,.59-.11,1.19-.32,1.8-.21.61-.65,1.46-1.32,2.57l-.29.5c-1.39,2.35-2.09,3.77-2.09,4.25,0,.39.09.69.26.89s.43.3.79.3c1.28,0,2.67-.73,4.15-2.19,1.49-1.46,2.52-3.22,3.09-5.26.18-.65.31-1.56.41-2.73.14-1.7.59-2.55,1.35-2.55.38,0,.66.13.85.39.18.26.28.64.28,1.16,0,.79-.32,1.85-.95,3.19-.63,1.34-1.5,2.75-2.61,4.22Z"/>
+                            <path fill="#75583F" d="M65.12,43.36c-.23.33-.42.57-.56.72-.14.14-.26.22-.36.22-.07,0-.12-.01-.15-.03s-.05-.07-.05-.15c0-.11.14-.36.43-.76.29-.4.69-.91,1.21-1.53,1.28-1.56,2.58-2.76,3.9-3.59,1.32-.83,2.57-1.25,3.75-1.25.7,0,1.25.2,1.68.6.42.4.63.92.63,1.56,0,1.29-.76,2.53-2.29,3.73s-3.57,2.12-6.14,2.77c-.08.56-.14.97-.16,1.23s-.04.47-.04.64c0,.68.15,1.21.44,1.59s.71.57,1.24.57c.71,0,1.47-.26,2.27-.78.8-.52,1.77-1.4,2.89-2.63.46-.52.96-1.1,1.48-1.76.52-.66.84-.99.95-.99.07,0,.13.02.17.07.05.05.07.1.07.16,0,.14-.13.38-.39.73-.26.35-.84,1.04-1.74,2.07-1.23,1.36-2.31,2.34-3.23,2.93-.93.59-1.82.89-2.68.89-1.04,0-1.89-.47-2.56-1.42s-1-2.15-1-3.6c0-.3.02-.62.06-.94.04-.33.1-.66.18-1.01ZM67.39,44.9c1.87-.45,3.47-1.35,4.81-2.68s2.01-2.58,2.01-3.75c0-.26-.07-.48-.22-.66-.14-.18-.32-.27-.52-.27-.91,0-1.98.71-3.21,2.14s-2.18,3.17-2.86,5.23Z"/>
+                            <path fill="#75583F" d="M87.28,40.15l1.72-2.8,2.76-.18-4.6,8.05c-.68,1.18-1.11,2-1.29,2.45-.18.46-.27.85-.27,1.18,0,.26.05.44.14.56.1.11.26.17.49.17.35,0,.91-.33,1.67-.99.76-.66,1.71-1.65,2.85-2.97.33-.36.71-.81,1.14-1.34.43-.53.69-.8.79-.8.08,0,.14.02.18.05.04.03.06.08.06.14,0,.17-.16.46-.47.89-.31.42-.8,1-1.45,1.73-1.47,1.68-2.56,2.78-3.26,3.29-.7.51-1.36.76-1.97.76-.56,0-.99-.2-1.28-.59-.29-.39-.44-.97-.44-1.73,0-.2.01-.42.04-.67.03-.25.08-.62.16-1.1-.96,1.35-1.88,2.37-2.77,3.06-.89.69-1.73,1.03-2.51,1.03s-1.34-.42-1.77-1.26c-.43-.84-.64-2-.64-3.49,0-.36.02-.73.07-1.09.05-.36.11-.72.2-1.07-.16.29-.32.51-.47.67-.15.16-.28.24-.39.24-.09,0-.16-.01-.19-.05s-.05-.08-.05-.14c0-.12.18-.42.53-.89s.83-1.05,1.43-1.73c1.31-1.45,2.62-2.58,3.94-3.38,1.32-.8,2.52-1.19,3.61-1.19.67,0,1.2.2,1.61.59.4.39.6.92.6,1.57,0,.15-.01.31-.04.48-.03.17-.07.35-.12.55ZM78.32,48.06c0,.44.09.79.27,1.05.18.26.42.39.74.39.46,0,1.04-.26,1.73-.77s1.41-1.23,2.16-2.16c1.13-1.38,2.01-2.72,2.63-4.04s.93-2.44.93-3.4c0-.41-.13-.75-.4-1.03-.27-.28-.59-.42-.97-.42-.68,0-1.43.33-2.23.99-.8.66-1.6,1.59-2.39,2.78-.76,1.2-1.37,2.39-1.8,3.59-.44,1.2-.66,2.21-.66,3.02Z"/>
+                            <path fill="#75583F" d="M93.15,50.11l5.44-9.03.16-.3c.78-1.27,1.17-2.11,1.17-2.5,0-.21-.04-.37-.13-.47s-.24-.15-.44-.15c-.45,0-1.03.32-1.75.96-.72.64-1.77,1.78-3.16,3.43-.29.33-.63.77-1.02,1.3-.48.65-.79.98-.94.98-.05,0-.1-.02-.14-.06-.04-.04-.06-.08-.06-.13,0-.12.07-.29.19-.5.13-.21.39-.56.77-1.05l1.33-1.61c1.35-1.61,2.37-2.69,3.06-3.24.69-.55,1.32-.83,1.89-.83.48,0,.87.19,1.18.57s.46.86.46,1.43c0,.74-.13,1.5-.38,2.27-.25.77-.79,1.94-1.63,3.5l.04-.05c1.51-1.62,2.7-2.84,3.56-3.66.53-1.58,1.05-2.65,1.54-3.22.5-.57,1.13-.85,1.89-.85.27,0,.5.07.68.22s.28.32.28.53c0,.53-.81,1.46-2.43,2.8-.27.23-.48.4-.63.52-.61.5-1.05,1.02-1.32,1.57-.27.55-.4,1.17-.4,1.86,0,.38.1.68.3.91.2.23.45.34.75.34.7,0,1.4-.37,2.11-1.11.71-.74,1.07-1.11,1.09-1.11.08.02.14.04.18.08.04.04.06.09.06.15,0,.36-.4.89-1.2,1.58-.8.69-1.51,1.03-2.14,1.03-.57,0-1.01-.15-1.31-.47-.3-.31-.45-.76-.45-1.35,0-.23.04-.52.12-.86s.22-.8.41-1.36c-.83.77-1.75,1.77-2.75,2.99-1,1.22-2.15,2.74-3.45,4.56l-2.93.32Z"/>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- BIO EN 1 LÍNEA CONTINUA EN PC / ADAPTADA EN MÓVIL -->
+            <div class="brand-bio">
+                <span class="bio-lead">Peluquería y Barbería de Caballeros y Niños</span>
+                <span class="bio-sub">Corte tradicional a peine y tijera · Definición de contorno natural</span>
+                <span class="bio-location">Tres generaciones en el mismo lugar de Recoleta</span>
+            </div>
+
+            <!-- REDES SOCIALES -->
+            <div class="social-bar">
+                <a href="https://www.instagram.com/peluqueriaalvear/" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5.5" ry="5.5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                </a>
+                <a href="https://www.facebook.com/PeluqueriaAlvear/" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+                <a href="tel:+5491164847021" class="social-btn" aria-label="Llamar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </a>
+            </div>
+        </header>
+
+        <!-- BOTÓN 1 (HERO): WHATSAPP CON ICONO OFICIAL -->
+        <a href="https://wa.me/5491164847021?text=Hola%20Peluquer%C3%ADa%20Alvear,%20quisiera%20consultar%20un%20turno%20para%20atenderme." target="_blank" rel="noopener noreferrer" class="btn-card btn-hero">
+            <div class="icon-box hero-gold">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+            </div>
+            <div class="btn-info">
+                <div class="btn-title-row">
+                    <span class="btn-title">Pedir Turno por WhatsApp</span>
+                    <span class="badge-pill gold">Directo</span>
+                </div>
+                <span class="btn-desc">+54 9 11 6484-7021 · Fernando Forti</span>
+            </div>
+            <div class="arrow-box">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </div>
+        </a>
+
+        <!-- TARJETA: HORARIOS OFICIALES -->
+        <div class="hours-card">
+            <div class="hours-header">
+                <div class="hours-title">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Horario de Atención</span>
+                </div>
+                <span class="badge-pill open-now" id="statusBadge">Comprobando...</span>
+            </div>
+            <div class="hours-table">
+                <div class="hours-row" id="row-tue-fri">
+                    <span>Martes a Viernes</span>
+                    <span class="time">10:00 h a 20:00 h</span>
+                </div>
+                <div class="hours-row" id="row-sat">
+                    <span>Sábados</span>
+                    <span class="time">10:00 h a 15:00 h</span>
+                </div>
+                <div class="hours-row" style="opacity: 0.6;">
+                    <span>Domingos y Lunes</span>
+                    <span class="time">Cerrado</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- =========================================================
+           CARRUSEL RESPONSIVO (SIN EPÍGRAFES NI DUPLICADOS)
+           ========================================================= -->
+        <div class="gallery-card">
+            <div class="gallery-header">
+                <div class="gallery-title-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span>Galería & Tradición</span>
+                </div>
+                <div class="gallery-controls-pc">
+                    <button class="nav-arrow-btn" onclick="scrollGallery(-1)" aria-label="Anterior">⟨</button>
+                    <button class="nav-arrow-btn" onclick="scrollGallery(1)" aria-label="Siguiente">⟩</button>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR GENERADO DINÁMICAMENTE DESDE JS -->
+            <div class="gallery-track" id="galleryTrack"></div>
+        </div>
+
+        <!-- BOTÓN: LLAMADA DIRECTA -->
+        <a href="tel:+5491164847021" class="btn-card">
+            <div class="icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div class="btn-info">
+                <span class="btn-title">Llamar al Salón</span>
+                <span class="btn-desc">Línea directa: 11 6484-7021</span>
+            </div>
+            <div class="arrow-box">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </div>
+        </a>
+
+        <!-- MAPA OFICIAL GOOGLE MAPS: ARRASTRE FLUIDO CON 1 DEDO Y ZOOM CON PELLIZCO -->
+        <div class="map-card">
+            <div class="map-header">
+                <div class="map-title">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span>Ubicación en Recoleta</span>
+                </div>
+                <span class="badge-pill">Av. Callao 1979</span>
+            </div>
+            <div class="map-address-sub">Tres generaciones en el mismo lugar de Recoleta</div>
+            <div class="map-box">
+                <div id="alvearMap"></div>
+            </div>
+        </div>
+
+        <!-- BOTÓN: CÓMO LLEGAR (GOOGLE MAPS) -->
+        <a href="https://maps.app.goo.gl/dfnWMGrih7oTWPFt6" target="_blank" rel="noopener noreferrer" class="btn-card">
+            <div class="icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            </div>
+            <div class="btn-info">
+                <span class="btn-title">Abrir en Google Maps</span>
+                <span class="btn-desc">Indicaciones directas para llegar al salón</span>
+            </div>
+            <div class="arrow-box">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </div>
+        </a>
+
+        <!-- FOOTER INSTITUCIONAL / CINTA DE AUTOR -->
+        <footer class="hub-footer">
+            <div class="ribbon-signature">
+                <span class="signature-text">Fernando Forti</span>
+            </div>
+            <div class="footer-legal-title">PELUQUERÍA ALVEAR · FUNDADA EN 1968 · RECOLETA</div>
+            <div class="footer-legal-sub">© 2026 TODOS LOS DERECHOS RESERVADOS</div>
+        </footer>
+
+    </main>
+
+    <!-- MODAL LIGHTBOX INTERACTIVO (ZOOM CON DEDOS, FLECHAS Y DESLIZAMIENTO) -->
+    <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
+        <!-- Flechas de navegación para PC / Móvil -->
+        <button class="lb-nav-btn lb-prev" onclick="event.stopPropagation(); navLightbox(-1);" aria-label="Foto anterior">⟨</button>
+        <button class="lb-nav-btn lb-next" onclick="event.stopPropagation(); navLightbox(1);" aria-label="Siguiente foto">⟩</button>
+
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <div class="lightbox-topbar">
+                <span class="lightbox-counter" id="lbCounter">1 / 12</span>
+                <button class="btn-close-lightbox" onclick="closeLightbox(event)">✕</button>
+            </div>
+            <div class="lightbox-img-wrap" id="lightboxImgWrap">
+                <img id="lightboxImg" src="" alt="Peluquería Alvear">
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         SCRIPTS: LISTA DE FOTOS, GESTOS, MAPA Y HORARIOS EN VIVO
+         ========================================================= -->
+    <script>
+        /* LISTA MAESTRA DE FOTOS (ÚNICAS Y ORDENADAS) */
+        const fotosCuradas = [
+            // 1. Tarjeta Oficial
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnZErkv6i1E57Bm-v3LMub7gH3QYmJ6yN8Ves1t5eiHfVzEyFvd2Rz40rC2_0d8mPDyVwv6C_qjQwg_oj3gL_j6Oajcy0CXjf_564YiHBy4u6jTUPzeGRYp4QBfpOv40mzSOj3h=s1200",
+            
+            // 2. Tres generaciones de barberos en el sillón histórico
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlS4BYJwvpSLkY6o3QBBAuimy0eCagzX-KZ0qeROz5gVToaRoXzygQATJRxKczISjMPtfTBsfPd1aMgYDVGohoFM8nay-mH3zEPQojsuyuz9F5FzT5pkOZmCuY7razUn5KaGSyF=s1200",
+            
+            // 3. Don Roberto Forti en plena labor artesanal en los años 70
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl-7LRHrzZC6BuhF5c2lJK9rYblSk3MqytU9F5bL_R9m0DDYNogEoRt_lx1CsbAkh9zWq5VtGEsnpuEZL-5E4fMQaWxDpEg-vfbkQXJ0_f7w5rWBmEJ7zMb4CUuCBTvkdRGj_c=s1200",
+            
+            // 4. Reliquias: Máquina manual, navajas y obra de Quinquela Martín (1970)
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnwHtc20Ygh4aTHYdJs8_PJofnzbrHu6pw1TgKi5HkmiMcwFzCOoIaT8bdTEePG0GMwefP5t_9HxTRVbwDcn_G1mQEpHiuyKKgEg0cG_oy-9g4jgGsar0a_Va64HJzXIYM9xjt5=s1200",
+            
+            // 5. Cuadro botánico en tréboles secos "PELUQUERÍA ALVEAR"
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmz-QBPKtA-y1Q3vhv1s6Zw2wFoy7Qx_LtpvQieBJMD0nlsVPXuJW_eKnF1T6aLXZ4zReRHt9krMii__Iz_5ftl4pIcIlZDXNFJJ0raOWigVsKoNZCX4NEpBJ6KTVFzwvR4tCYQ=s1200",
+            
+            // 6. Estaciones de trabajo clásicas con espejos biselados
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWm3pOVB_n_Pi2cuMQqCHhjb3hNDXztjg16YzxkmMTobbnnGTGjKnGIoWdC02l2FrhjYXjTCF0MCX5bJZt2sQF4XoAHhYEcp_g1cP5V9ct8vRGIcR3nMf_uB65zDH2cvwdcpvnPq_A=s1200",
+            
+            // 7. Sillón de espera y vitrina de colección retro
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmgObIAwjX50hM-zSuh0tij9KHpSiSZVpz6MvW0xVLCIqIzyuZ9hexn8erFfXkZNH5nYReTrh67ppXB3nQCkb2DjvLQSVgW0nEUjrtAw79pV0lqSyYSoyGz-1x6DnD94sjXWxcz=s1200",
+            
+            // 8. Colección de autos clásicos a escala y licores
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkPAdUi6PxaEOJjmv3liGQOIAekKPtDAdRj1JaURSqmEgPxRBOIfy0ALg88sR3dY6cUF8d2qJ2J9rzn3HTJmTzrU-hR7-OTwQ_TO7On_lDXy9v4nab3HMYHxHbflo0Z-LO9jKxZ=s1200",
+            
+            // 9. Fachada histórica sobre Av. Callao 1979
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlSRK-gRC_b5R2oUiZSIC7tN5juFuXuX5JuDbTwhjcrkVceqbrKMFFOI0tdHF5Rtbf1HxAd41Z-JyYIvvqKXytuG2BEbQvXe4__kUF0JWWlonfTzqv22jH6G1tv38xIjGTRSVaI=s1200",
+            
+            // 10. Corte tradicional infantil con dedicación
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkeeiAOP3oYlB3j1yY2FlVxGky1ktXkSO6GLVTjkEB6oLE09ZsJYc4G-cN-Yx_mW5nvFVD_OwjRwnC_s3xRQny5ORIZBLg0DZ1ndb5pSolYz_veNcTnd1q-wRhu6Eooqfk-6qr-Dg=s1200",
+            
+            // 11. Fernando Forti y la atención cálida de siempre
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkBBuCgbaQggavdMDCqZtIdw8z6LpcXWu7zRLVkvb8t6XxGBH95DAvk3QuvIdaS4JWSoqQ-1KWsGGRg-HLhrDg3hKash09B2fi0IXAXT6X3ybQQ0tPesZJQqP1iyvKqluSg1zWl=s1200",
+            
+            // 12. Terminación clásica a peine y tijera: caída natural
+            "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl1Fx6STeyS8SNcw0QKjjP2naYYToOsWCQg2McchqqWmMvvpDnNhXIeERhfGhJ8V7Hw6kufu2qyKrIfDaDERT744mjwOIZnPzy4zTLmQUh3elvSVMiFCo3Sod2ss_0yE3SFqR4=s1200"
+        ];
+
+        // RENDERIZADO DINÁMICO DEL CARRUSEL (SIN EPÍGRAFES)
+        function renderGalleryTrack() {
+            const track = document.getElementById('galleryTrack');
+            track.innerHTML = fotosCuradas.map((url, index) => `
+                <div class="gallery-item" onclick="openLightbox(${index})">
+                    <img src="${url}" alt="Peluquería Alvear" loading="lazy">
+                </div>
+            `).join('');
+        }
+
+        // DESPLAZAMIENTO DEL CARRUSEL EN PC
+        function scrollGallery(direction) {
+            const track = document.getElementById('galleryTrack');
+            const step = 280;
+            track.scrollBy({ left: direction * step, behavior: 'smooth' });
+        }
+
+        // CONTROL DEL LIGHTBOX, NAVEGACIÓN Y PINCH-TO-ZOOM
+        let currentPhotoIndex = 0;
+        let scale = 1;
+        let startScale = 1;
+        let initialDistance = 0;
+        let startX = 0, startY = 0;
+        let posX = 0, posY = 0;
+        let lastTap = 0;
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let isPinching = false;
+
+        const modalEl = document.getElementById('lightboxModal');
+        const imgEl = document.getElementById('lightboxImg');
+        const counterEl = document.getElementById('lbCounter');
+        const wrapEl = document.getElementById('lightboxImgWrap');
+
+        function updateTransform() {
+            imgEl.style.transform = `scale(${scale}) translate(${posX}px, ${posY}px)`;
+        }
+
+        function resetZoom() {
+            scale = 1;
+            posX = 0;
+            posY = 0;
+            updateTransform();
+        }
+
+        function renderPhoto(index) {
+            currentPhotoIndex = (index + fotosCuradas.length) % fotosCuradas.length;
+            resetZoom();
+            imgEl.src = fotosCuradas[currentPhotoIndex];
+            counterEl.innerText = `${currentPhotoIndex + 1} / ${fotosCuradas.length}`;
+        }
+
+        function openLightbox(index) {
+            renderPhoto(index);
+            modalEl.classList.add('active');
+        }
+
+        function closeLightbox(e) {
+            modalEl.classList.remove('active');
+            resetZoom();
+        }
+
+        function navLightbox(direction) {
+            renderPhoto(currentPhotoIndex + direction);
+        }
+
+        // GESTOS TÁCTILES: PINCH-TO-ZOOM, PAN, DOBLE TAP Y SWIPE
+        wrapEl.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                isPinching = true;
+                initialDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                startScale = scale;
+            } else if (e.touches.length === 1) {
+                isPinching = false;
+                touchStartX = e.touches[0].clientX;
+                startX = e.touches[0].clientX - posX;
+                startY = e.touches[0].clientY - posY;
+
+                const currentTime = Date.now();
+                if (currentTime - lastTap < 300) {
+                    if (scale > 1) {
+                        resetZoom();
+                    } else {
+                        scale = 2.2;
+                        updateTransform();
+                    }
+                }
+                lastTap = currentTime;
+            }
+        }, { passive: false });
+
+        wrapEl.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && isPinching) {
+                e.preventDefault();
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                scale = Math.min(Math.max(1, startScale * (dist / initialDistance)), 3.5);
+                updateTransform();
+            } else if (e.touches.length === 1 && scale > 1) {
+                e.preventDefault();
+                posX = e.touches[0].clientX - startX;
+                posY = e.touches[0].clientY - startY;
+                updateTransform();
+            }
+        }, { passive: false });
+
+        wrapEl.addEventListener('touchend', (e) => {
+            if (scale <= 1) {
+                resetZoom();
+                if (e.changedTouches.length === 1) {
+                    touchEndX = e.changedTouches[0].clientX;
+                    const diff = touchEndX - touchStartX;
+                    if (Math.abs(diff) > 45) {
+                        if (diff > 0) navLightbox(-1);
+                        else navLightbox(1);
+                    }
+                }
+            }
+        });
+
+        // CONTROL CON TECLADO EN COMPUTADORA (FLECHAS Y ESCAPE)
+        window.addEventListener('keydown', (e) => {
+            if (!modalEl.classList.contains('active')) return;
+            if (e.key === 'ArrowLeft') navLightbox(-1);
+            if (e.key === 'ArrowRight') navLightbox(1);
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        // INICIALIZACIÓN DEL MAPA CON GOOGLE MAPS TILES (DESPLAZAMIENTO FLUIDO CON 1 DEDO Y ZOOM CON 2 DEDOS)
+        function initMap() {
+            const lat = -34.58783;
+            const lng = -58.38870;
+
+            const map = L.map('alvearMap', {
+                center: [lat, lng],
+                zoom: 16,
+                zoomControl: true,
+                scrollWheelZoom: true,
+                dragging: true,   // 1 dedo o ratón desplaza el mapa libremente
+                touchZoom: true   // 2 dedos hacen zoom pellizcando
+            });
+
+            // Capa nativa de Google Maps Roadmap (100% libre, sin API key ni trabas)
+            L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '&copy; Google Maps'
+            }).addTo(map);
+
+            // Marcador exacto con el pin oficial de Google Maps
+            const redPinIcon = L.divIcon({
+                className: 'custom-google-pin',
+                html: `
+                    <div style="filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35)); cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <svg viewBox="0 0 24 24" width="38" height="38" fill="#EA4335">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </div>
+                `,
+                iconSize: [38, 38],
+                iconAnchor: [19, 36],
+                popupAnchor: [0, -34]
+            });
+
+            L.marker([lat, lng], { icon: redPinIcon }).addTo(map)
+                .bindPopup(`
+                    <div style="text-align: center; padding: 4px 2px;">
+                        <strong style="font-family: var(--font-serif); font-size: 0.98rem; color: #3F2918; display: block; margin-bottom: 2px;">Peluquería Alvear</strong>
+                        <span style="display: block; font-size: 0.78rem; font-weight: 600; color: #75583F; margin-bottom: 3px;">Tres generaciones en el mismo lugar de Recoleta</span>
+                        <span style="display: block; font-size: 0.74rem; color: #7E6D62;">Av. Callao 1979, C1024 CABA</span>
+                    </div>
+                `)
+                .openPopup();
+
+            setTimeout(() => { map.invalidateSize(); }, 300);
+        }
+
+        // ESTADO DE APERTURA EN VIVO (HORARIO DE BUENOS AIRES)
+        function updateStoreStatus() {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const argDate = new Date(utc - (3600000 * 3));
+            
+            const day = argDate.getDay(); // 0 = Dom, 1 = Lun, 2 = Mar... 6 = Sab
+            const hour = argDate.getHours();
+            const min = argDate.getMinutes();
+            const timeVal = hour + min / 60;
+
+            const badge = document.getElementById('statusBadge');
+            let isOpen = false;
+
+            if (day >= 2 && day <= 5) {
+                document.getElementById('row-tue-fri').classList.add('active-day');
+                if (timeVal >= 10 && timeVal < 20) isOpen = true;
+            } else if (day === 6) {
+                document.getElementById('row-sat').classList.add('active-day');
+                if (timeVal >= 10 && timeVal < 15) isOpen = true;
+            }
+
+            if (isOpen) {
+                badge.innerText = "Abierto Ahora";
+                badge.className = "badge-pill open-now";
+            } else {
+                badge.innerText = "Cerrado";
+                badge.style.background = "rgba(117, 88, 63, 0.08)";
+                badge.style.color = "var(--brand-brown)";
+                badge.style.borderColor = "rgba(117, 88, 63, 0.2)";
+            }
+        }
+
+        // ARRANQUE
+        window.addEventListener('DOMContentLoaded', () => {
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            renderGalleryTrack();
+            initMap();
+            updateStoreStatus();
+            requestAnimationFrame(() => document.body.classList.remove('preload'));
+        });
+    </script>
+</body>
+</html>
